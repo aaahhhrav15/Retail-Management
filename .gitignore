@@ -41,3 +41,7 @@ coverage/
 *.temp
 .cache/
 
+# Large dataset files
+*.csv
+truestate_assignment_dataset.csv
+
