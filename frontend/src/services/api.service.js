@@ -1,0 +1,44 @@
+import axios from 'axios'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+export const apiService = {
+  // Transaction API calls
+  getTransactions: async (page = 1, limit = 100) => {
+    const response = await apiClient.get('/transactions', {
+      params: { page, limit }
+    })
+    return response.data
+  },
+
+  searchTransactions: async (filters = {}, page = 1, limit = 100) => {
+    const response = await apiClient.get('/transactions/search', {
+      params: { ...filters, page, limit }
+    })
+    return response.data
+  },
+
+  getTransactionById: async (id) => {
+    const response = await apiClient.get(`/transactions/${id}`)
+    return response.data
+  },
+
+  getStatistics: async () => {
+    const response = await apiClient.get('/transactions/statistics')
+    return response.data
+  },
+
+  getFilterOptions: async () => {
+    const response = await apiClient.get('/transactions/filter-options')
+    return response.data
+  }
+}
+
+export default apiService
