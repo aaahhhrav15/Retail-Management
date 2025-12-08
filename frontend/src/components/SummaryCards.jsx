@@ -15,7 +15,7 @@ const SummaryCards = ({ statistics }) => {
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-[#6b7280]">Total units sold</span>
-              <button className="text-[#9ca3af] hover:text-[#6b7280]" title="Information">
+              <button className="text-[#9ca3af] hover:text-[#6b7280] relative" title="Total number of product units sold across all transactions">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -26,7 +26,7 @@ const SummaryCards = ({ statistics }) => {
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-[#6b7280]">Total Amount</span>
-              <button className="text-[#9ca3af] hover:text-[#6b7280]" title="Information">
+              <button className="text-[#9ca3af] hover:text-[#6b7280] relative" title="Total revenue amount from all sales transactions (SRs = Sales Records)">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -39,7 +39,7 @@ const SummaryCards = ({ statistics }) => {
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-[#6b7280]">Total Discount</span>
-              <button className="text-[#9ca3af] hover:text-[#6b7280]" title="Information">
+              <button className="text-[#9ca3af] hover:text-[#6b7280] relative" title="Total discount amount applied across all transactions (calculated as difference between total amount and total revenue)">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -62,7 +62,7 @@ const SummaryCards = ({ statistics }) => {
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[#6b7280]">Total units sold</span>
-            <button className="text-[#9ca3af] hover:text-[#6b7280]" title="Information">
+            <button className="text-[#9ca3af] hover:text-[#6b7280] relative" title="Total number of product units sold across all transactions">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -75,7 +75,7 @@ const SummaryCards = ({ statistics }) => {
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[#6b7280]">Total Amount</span>
-            <button className="text-[#9ca3af] hover:text-[#6b7280]" title="Information">
+            <button className="text-[#9ca3af] hover:text-[#6b7280] relative" title="Total revenue amount from all sales transactions (SRs = Sales Records)">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -91,7 +91,7 @@ const SummaryCards = ({ statistics }) => {
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[#6b7280]">Total Discount</span>
-            <button className="text-[#9ca3af] hover:text-[#6b7280]" title="Information">
+            <button className="text-[#9ca3af] hover:text-[#6b7280] relative" title="Total discount amount applied across all transactions (calculated as difference between total amount and total revenue)">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

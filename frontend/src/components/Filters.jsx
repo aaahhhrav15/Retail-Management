@@ -72,7 +72,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
         </button>
         
         <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[140px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[140px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
           value={filters.customerRegion || 'Customer Region'}
           onChange={(e) => onFilterChange('customerRegion', e.target.value === 'Customer Region' ? '' : e.target.value)}
         >
@@ -82,7 +82,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
         </select>
   
         <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[100px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[100px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
           value={filters.gender || 'Gender'}
           onChange={(e) => onFilterChange('gender', e.target.value === 'Gender' ? '' : e.target.value)}
         >
@@ -90,9 +90,15 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
             <option key={gender} value={gender}>{gender}</option>
           ))}
         </select>
+
+        {/* Age Range Filter */}
+        <AgeRangeFilter
+          value={filters.ageFilter || null}
+          onChange={handleAgeFilterChange}
+        />
   
         <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[150px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[150px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
           value={filters.productCategory || 'Product Category'}
           onChange={(e) => onFilterChange('productCategory', e.target.value === 'Product Category' ? '' : e.target.value)}
         >
@@ -102,7 +108,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
         </select>
   
         <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[80px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[80px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
           value={filters.tags || 'Tags'}
           onChange={(e) => onFilterChange('tags', e.target.value === 'Tags' ? '' : e.target.value)}
         >
@@ -112,7 +118,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
         </select>
   
         <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[140px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[140px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
           value={filters.paymentMethod || 'Payment Method'}
           onChange={(e) => onFilterChange('paymentMethod', e.target.value === 'Payment Method' ? '' : e.target.value)}
         >
@@ -121,12 +127,6 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           ))}
         </select>
 
-        {/* Age Range Filter */}
-        <AgeRangeFilter
-          value={filters.ageFilter || null}
-          onChange={handleAgeFilterChange}
-        />
-
         {/* Date Range Filter */}
         <DateRangeFilter
           value={filters.dateFilter || null}
@@ -134,7 +134,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
         />
   
         <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[200px] text-[#6b7280] ml-auto focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[200px] text-[#6b7280] ml-auto focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
           value={filters.sortBy || 'customerName'}
           onChange={(e) => {
             const value = e.target.value

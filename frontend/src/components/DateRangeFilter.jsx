@@ -81,28 +81,28 @@ const DateRangeFilter = ({ value, onChange }) => {
 
   const getDisplayText = () => {
     if (!value || !value.preset) {
-      return 'Date: Any'
+      return ''
     }
 
     if (value.preset === 'today') {
-      return 'Date: Today'
+      return 'Today'
     } else if (value.preset === 'last7days') {
-      return 'Date: Last 7 days'
+      return 'Last 7 days'
     } else if (value.preset === 'last30days') {
-      return 'Date: Last 30 days'
+      return 'Last 30 days'
     } else if (value.preset === 'thisMonth') {
-      return 'Date: This month'
+      return 'This month'
     } else if (value.preset === 'custom' && value.from && value.to) {
-      return `Date: ${formatDisplayDate(value.from)} – ${formatDisplayDate(value.to)}`
+      return `${formatDisplayDate(value.from)} – ${formatDisplayDate(value.to)}`
     } else if (value.preset === 'custom' && (value.from || value.to)) {
       if (value.from) {
-        return `Date: ${formatDisplayDate(value.from)} – ...`
+        return `${formatDisplayDate(value.from)} – ...`
       } else if (value.to) {
-        return `Date: ... – ${formatDisplayDate(value.to)}`
+        return `... – ${formatDisplayDate(value.to)}`
       }
     }
 
-    return 'Date: Any'
+    return ''
   }
 
   const handlePresetClick = (preset) => {
@@ -164,9 +164,11 @@ const DateRangeFilter = ({ value, onChange }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[200px] text-left text-[#6b7280] hover:border-[#3b82f6] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20 flex items-center justify-between"
+        className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[200px] text-left text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20 flex items-center justify-between"
       >
-        <span className="truncate">{getDisplayText()}</span>
+        <span className="truncate text-[#6b7280]">
+          {getDisplayText() || 'Date Range'}
+        </span>
         <svg
           className={`w-4 h-4 transition-transform flex-shrink-0 ml-2 ${isOpen ? 'transform rotate-180' : ''}`}
           fill="none"

@@ -55,21 +55,21 @@ const AgeRangeFilter = ({ value, onChange }) => {
 
   const getDisplayText = () => {
     if (!value || (value.min === null && value.max === null)) {
-      return 'Age: Any'
+      return ''
     }
 
     const min = value.min
     const max = value.max
 
     if (min !== null && max !== null) {
-      return `Age: ${min}–${max}`
+      return `Age Range: ${min}–${max}`
     } else if (min !== null) {
-      return `Age: ≥${min}`
+      return `Age Range: ≥${min}`
     } else if (max !== null) {
-      return `Age: ≤${max}`
+      return `Age Range: ≤${max}`
     }
 
-    return 'Age: Any'
+    return ''
   }
 
   const handlePresetClick = (range) => {
@@ -119,9 +119,11 @@ const AgeRangeFilter = ({ value, onChange }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[140px] text-left text-[#6b7280] hover:border-[#3b82f6] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20 flex items-center justify-between"
+        className="py-2 px-3 border border-[#e0e0e0] rounded-md text-xs bg-white cursor-pointer outline-none min-w-[140px] text-left text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20 flex items-center justify-between"
       >
-        <span>{getDisplayText()}</span>
+        <span className={getDisplayText() ? 'text-[#6b7280]' : 'text-[#6b7280]'}>
+          {getDisplayText() || 'Age Range'}
+        </span>
         <svg
           className={`w-4 h-4 transition-transform ${isOpen ? 'transform rotate-180' : ''}`}
           fill="none"

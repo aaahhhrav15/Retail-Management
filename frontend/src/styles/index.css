@@ -19,3 +19,39 @@ body {
 #root {
   min-height: 100vh;
 }
+
+[title] {
+  position: relative;
+  cursor: help;
+}
+
+[title]:hover::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  transition-delay: 1s;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: #1f2937;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+  opacity: 0;
+  transition: opacity 0.2s 2s;
+}
+
+[title]:hover::after {
+  opacity: 1;
+}
