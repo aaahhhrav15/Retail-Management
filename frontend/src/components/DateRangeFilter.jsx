@@ -5,6 +5,7 @@ const DateRangeFilter = ({ value, onChange }) => {
   const [tempFrom, setTempFrom] = useState('')
   const [tempTo, setTempTo] = useState('')
   const [showCustom, setShowCustom] = useState(false)
+  const [error, setError] = useState('')
   const dropdownRef = useRef(null)
 
   const formatDate = (date) => {
@@ -135,12 +136,37 @@ const DateRangeFilter = ({ value, onChange }) => {
   }
 
   const handleApply = () => {
+    setError('')
+    
+    // Validate dates if both are provided
+    if (tempFrom && tempTo) {
+      const fromDate = new Date(tempFrom)
+      const toDate = new Date(tempTo)
+      
+      if (isNaN(fromDate.getTime())) {
+        setError('Invalid start date format.')
+        return
+      }
+      
+      if (isNaN(toDate.getTime())) {
+        setError('Invalid end date format.')
+        return
+      }
+      
+      if (fromDate > toDate) {
+        setError('Start date cannot be after end date.')
+        return
+      }
+    }
+    
+    // Only apply if validation passes
     if (tempFrom === '' && tempTo === '') {
       onChange(null)
     } else {
       onChange({ preset: 'custom', from: tempFrom || null, to: tempTo || null })
     }
     setIsOpen(false)
+    setError('')
   }
 
   const handleClear = () => {
@@ -210,13 +236,23 @@ const DateRangeFilter = ({ value, onChange }) => {
           {/* Custom Date Inputs */}
           {showCustom && (
             <div className="space-y-3">
+              {error && (
+                <div className="p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800">
+                  {error}
+                </div>
+              )}
               <div className="space-y-2">
                 <label className="text-sm text-[#6b7280] block">From:</label>
                 <input
                   type="date"
                   value={tempFrom}
-                  onChange={(e) => setTempFrom(e.target.value)}
-                  className="w-full py-1.5 px-2 border border-[#e0e0e0] rounded text-sm outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+                  onChange={(e) => {
+                    setTempFrom(e.target.value)
+                    setError('') // Clear error when user changes input
+                  }}
+                  className={`w-full py-1.5 px-2 border rounded text-sm outline-none focus:ring-1 ${
+                    error ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-[#e0e0e0] focus:border-[#3b82f6] focus:ring-[#3b82f6]/20'
+                  }`}
                 />
               </div>
               <div className="space-y-2">
@@ -224,8 +260,13 @@ const DateRangeFilter = ({ value, onChange }) => {
                 <input
                   type="date"
                   value={tempTo}
-                  onChange={(e) => setTempTo(e.target.value)}
-                  className="w-full py-1.5 px-2 border border-[#e0e0e0] rounded text-sm outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
+                  onChange={(e) => {
+                    setTempTo(e.target.value)
+                    setError('') // Clear error when user changes input
+                  }}
+                  className={`w-full py-1.5 px-2 border rounded text-sm outline-none focus:ring-1 ${
+                    error ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-[#e0e0e0] focus:border-[#3b82f6] focus:ring-[#3b82f6]/20'
+                  }`}
                 />
               </div>
               <div className="flex gap-2 pt-2">

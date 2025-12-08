@@ -7,6 +7,93 @@ let cachedFilterOptions = null;
 let isInitialized = false;
 
 /**
+ * Validate filters for conflicts and invalid ranges
+ * Returns { valid: boolean, error: string }
+ */
+export function validateFilters(filters) {
+  // Validate amount range
+  if (filters.minAmount !== undefined && filters.minAmount !== null && filters.minAmount !== '') {
+    const minAmount = parseFloat(filters.minAmount);
+    if (isNaN(minAmount) || minAmount < 0) {
+      return { valid: false, error: 'Invalid minimum amount. Must be a non-negative number.' };
+    }
+  }
+
+  if (filters.maxAmount !== undefined && filters.maxAmount !== null && filters.maxAmount !== '') {
+    const maxAmount = parseFloat(filters.maxAmount);
+    if (isNaN(maxAmount) || maxAmount < 0) {
+      return { valid: false, error: 'Invalid maximum amount. Must be a non-negative number.' };
+    }
+  }
+
+  // Check for conflicting amount range
+  if (filters.minAmount !== undefined && filters.minAmount !== null && filters.minAmount !== '' &&
+      filters.maxAmount !== undefined && filters.maxAmount !== null && filters.maxAmount !== '') {
+    const minAmount = parseFloat(filters.minAmount);
+    const maxAmount = parseFloat(filters.maxAmount);
+    if (!isNaN(minAmount) && !isNaN(maxAmount) && minAmount > maxAmount) {
+      return { valid: false, error: 'Minimum amount cannot be greater than maximum amount.' };
+    }
+  }
+
+  // Validate date range
+  if (filters.dateFrom && filters.dateTo) {
+    const dateFrom = new Date(filters.dateFrom);
+    const dateTo = new Date(filters.dateTo);
+    
+    if (isNaN(dateFrom.getTime())) {
+      return { valid: false, error: 'Invalid start date format.' };
+    }
+    if (isNaN(dateTo.getTime())) {
+      return { valid: false, error: 'Invalid end date format.' };
+    }
+    
+    if (dateFrom > dateTo) {
+      return { valid: false, error: 'Start date cannot be after end date.' };
+    }
+  }
+
+  // Validate age range
+  if (filters.ageRange) {
+    const ageRange = filters.ageRange.trim();
+    if (ageRange.includes('+')) {
+      const minAge = parseInt(ageRange.replace('+', ''));
+      if (isNaN(minAge) || minAge < 0 || minAge > 150) {
+        return { valid: false, error: 'Invalid age range. Age must be between 0 and 150.' };
+      }
+    } else if (ageRange.includes('-')) {
+      const parts = ageRange.split('-').map(age => parseInt(age.trim()));
+      if (parts.length !== 2 || parts.some(age => isNaN(age) || age < 0 || age > 150)) {
+        return { valid: false, error: 'Invalid age range. Age must be between 0 and 150.' };
+      }
+      const [minAge, maxAge] = parts;
+      if (minAge > maxAge) {
+        return { valid: false, error: 'Minimum age cannot be greater than maximum age.' };
+      }
+    } else {
+      return { valid: false, error: 'Invalid age range format. Use "min-max" or "min+".' };
+    }
+  }
+
+  // Validate page and limit (if provided)
+  if (filters.page !== undefined) {
+    const page = parseInt(filters.page);
+    if (isNaN(page) || page < 1) {
+      return { valid: false, error: 'Invalid page number. Must be a positive integer.' };
+    }
+  }
+
+  if (filters.limit !== undefined) {
+    const limit = parseInt(filters.limit);
+    if (isNaN(limit) || limit < 1 || limit > 1000) {
+      return { valid: false, error: 'Invalid limit. Must be between 1 and 1000.' };
+    }
+  }
+
+  return { valid: true, error: null };
+}
+
+/**
  * Initialize database connection and cache statistics/filter options
  */
 export async function initializeDataService() {
@@ -142,12 +229,16 @@ function buildQuery(filters) {
   }
 
   // Use exact match for dropdown selections (faster with index)
-  // Handle customerRegion as array (multi-select)
+  // Handle customerRegion as array (multi-select) - support large filter combinations
   if (filters.customerRegion) {
-    if (Array.isArray(filters.customerRegion) && filters.customerRegion.length > 0) {
-      query.customerRegion = { $in: filters.customerRegion };
-    } else if (typeof filters.customerRegion === 'string') {
-      query.customerRegion = filters.customerRegion;
+    if (Array.isArray(filters.customerRegion)) {
+      // Filter out empty/null values and limit to prevent extremely large queries
+      const validRegions = filters.customerRegion.filter(r => r && typeof r === 'string' && r.trim()).slice(0, 100);
+      if (validRegions.length > 0) {
+        query.customerRegion = { $in: validRegions };
+      }
+    } else if (typeof filters.customerRegion === 'string' && filters.customerRegion.trim()) {
+      query.customerRegion = filters.customerRegion.trim();
     }
   }
 
@@ -155,12 +246,16 @@ function buildQuery(filters) {
     query.gender = filters.gender;
   }
 
-  // Handle productCategory as array (multi-select)
+  // Handle productCategory as array (multi-select) - support large filter combinations
   if (filters.productCategory) {
-    if (Array.isArray(filters.productCategory) && filters.productCategory.length > 0) {
-      query.productCategory = { $in: filters.productCategory };
-    } else if (typeof filters.productCategory === 'string') {
-      query.productCategory = filters.productCategory;
+    if (Array.isArray(filters.productCategory)) {
+      // Filter out empty/null values and limit to prevent extremely large queries
+      const validCategories = filters.productCategory.filter(c => c && typeof c === 'string' && c.trim()).slice(0, 100);
+      if (validCategories.length > 0) {
+        query.productCategory = { $in: validCategories };
+      }
+    } else if (typeof filters.productCategory === 'string' && filters.productCategory.trim()) {
+      query.productCategory = filters.productCategory.trim();
     }
   }
 
@@ -176,74 +271,126 @@ function buildQuery(filters) {
     query.brand = { $regex: filters.brand, $options: 'i' };
   }
 
-  // Handle paymentMethod as array (multi-select)
+  // Handle paymentMethod as array (multi-select) - support large filter combinations
   if (filters.paymentMethod) {
-    if (Array.isArray(filters.paymentMethod) && filters.paymentMethod.length > 0) {
-      query.paymentMethod = { $in: filters.paymentMethod };
-    } else if (typeof filters.paymentMethod === 'string') {
-      query.paymentMethod = filters.paymentMethod;
+    if (Array.isArray(filters.paymentMethod)) {
+      // Filter out empty/null values and limit to prevent extremely large queries
+      const validMethods = filters.paymentMethod.filter(m => m && typeof m === 'string' && m.trim()).slice(0, 100);
+      if (validMethods.length > 0) {
+        query.paymentMethod = { $in: validMethods };
+      }
+    } else if (typeof filters.paymentMethod === 'string' && filters.paymentMethod.trim()) {
+      query.paymentMethod = filters.paymentMethod.trim();
     }
   }
 
   // Date filters - date range takes priority over individual date
+  // Handle missing optional fields gracefully
   if (filters.dateFrom || filters.dateTo) {
     // Date range filter
     query.date = {};
     if (filters.dateFrom) {
-      const dateFrom = new Date(filters.dateFrom);
-      dateFrom.setHours(0, 0, 0, 0);
-      query.date.$gte = dateFrom;
+      try {
+        const dateFrom = new Date(filters.dateFrom);
+        if (!isNaN(dateFrom.getTime())) {
+          dateFrom.setHours(0, 0, 0, 0);
+          query.date.$gte = dateFrom;
+        }
+      } catch (error) {
+        // Invalid date, skip this filter
+        console.warn('Invalid dateFrom:', filters.dateFrom);
+      }
     }
     if (filters.dateTo) {
-      const dateTo = new Date(filters.dateTo);
-      dateTo.setHours(23, 59, 59, 999); // Include entire day
-      query.date.$lte = dateTo;
+      try {
+        const dateTo = new Date(filters.dateTo);
+        if (!isNaN(dateTo.getTime())) {
+          dateTo.setHours(23, 59, 59, 999); // Include entire day
+          query.date.$lte = dateTo;
+        }
+      } catch (error) {
+        // Invalid date, skip this filter
+        console.warn('Invalid dateTo:', filters.dateTo);
+      }
+    }
+    // Remove date filter if it's empty (both dates were invalid)
+    if (Object.keys(query.date).length === 0) {
+      delete query.date;
     }
   } else if (filters.date) {
     // Individual date filter (only if no date range is set)
-    const filterDate = new Date(filters.date);
-    filterDate.setHours(0, 0, 0, 0);
-    const nextDay = new Date(filterDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    query.date = { $gte: filterDate, $lt: nextDay };
+    try {
+      const filterDate = new Date(filters.date);
+      if (!isNaN(filterDate.getTime())) {
+        filterDate.setHours(0, 0, 0, 0);
+        const nextDay = new Date(filterDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        query.date = { $gte: filterDate, $lt: nextDay };
+      }
+    } catch (error) {
+      // Invalid date, skip this filter
+      console.warn('Invalid date:', filters.date);
+    }
   }
 
+  // Amount range filter - handle missing/optional fields
   if (filters.minAmount !== undefined && filters.minAmount !== null && filters.minAmount !== '') {
-    if (!query.finalAmount) query.finalAmount = {};
-    query.finalAmount.$gte = parseFloat(filters.minAmount);
+    const minAmount = parseFloat(filters.minAmount);
+    if (!isNaN(minAmount) && minAmount >= 0) {
+      if (!query.finalAmount) query.finalAmount = {};
+      query.finalAmount.$gte = minAmount;
+    }
   }
 
   if (filters.maxAmount !== undefined && filters.maxAmount !== null && filters.maxAmount !== '') {
-    if (!query.finalAmount) query.finalAmount = {};
-    query.finalAmount.$lte = parseFloat(filters.maxAmount);
+    const maxAmount = parseFloat(filters.maxAmount);
+    if (!isNaN(maxAmount) && maxAmount >= 0) {
+      if (!query.finalAmount) query.finalAmount = {};
+      query.finalAmount.$lte = maxAmount;
+    }
   }
 
-  // Age range filter
+  // Age range filter - handle missing/optional fields and validate
   if (filters.ageRange) {
-    const ageRange = filters.ageRange;
-    if (ageRange.includes('+')) {
-      const minAge = parseInt(ageRange.replace('+', ''));
-      query.age = { $gte: minAge };
-    } else if (ageRange.includes('-')) {
-      const [minAge, maxAge] = ageRange.split('-').map(age => parseInt(age.trim()));
-      query.age = { $gte: minAge, $lte: maxAge };
+    try {
+      const ageRange = filters.ageRange.trim();
+      if (ageRange.includes('+')) {
+        const minAge = parseInt(ageRange.replace('+', ''));
+        if (!isNaN(minAge) && minAge >= 0 && minAge <= 150) {
+          query.age = { $gte: minAge };
+        }
+      } else if (ageRange.includes('-')) {
+        const parts = ageRange.split('-').map(age => parseInt(age.trim()));
+        if (parts.length === 2 && !parts.some(age => isNaN(age) || age < 0 || age > 150)) {
+          const [minAge, maxAge] = parts;
+          if (minAge <= maxAge) {
+            query.age = { $gte: minAge, $lte: maxAge };
+          }
+        }
+      }
+    } catch (error) {
+      // Invalid age range, skip this filter
+      console.warn('Invalid ageRange:', filters.ageRange);
     }
   }
 
   // Tags filter - support multiple tags (array or comma-separated string)
+  // Support large filter combinations with limits
   if (filters.tags) {
     // Handle both array and comma-separated string formats
     let tagArray = [];
     if (Array.isArray(filters.tags)) {
-      tagArray = filters.tags.filter(tag => tag && tag.trim());
+      tagArray = filters.tags.filter(tag => tag && typeof tag === 'string' && tag.trim());
     } else if (typeof filters.tags === 'string') {
-      tagArray = filters.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      tagArray = filters.tags.split(',').map(tag => tag.trim()).filter(tag => tag && tag.length > 0);
     }
     
+    // Limit to prevent extremely large queries (max 100 tags)
     if (tagArray.length > 0) {
+      const validTags = tagArray.slice(0, 100);
       // Use $in to match any of the selected tags (OR logic)
       // This means a transaction matches if it has ANY of the selected tags
-      query.tags = { $in: tagArray };
+      query.tags = { $in: validTags };
     }
   }
 
@@ -281,11 +428,17 @@ function buildSort(sortBy, sortOrder) {
  * Search/filter transactions - Optimized with MongoDB queries
  */
 export async function searchTransactions(filters = {}, page = 1, limit = 100) {
+  // Validate filters first
+  const validation = validateFilters({ ...filters, page, limit });
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
+
   // Ensure valid page and limit
   page = Math.max(1, page);
-  limit = Math.max(1, limit);
+  limit = Math.max(1, Math.min(limit, 1000)); // Cap at 1000 for performance
 
-  // Build MongoDB query
+  // Build MongoDB query - handle missing optional fields gracefully
   const query = buildQuery(filters);
   
   // Get total count

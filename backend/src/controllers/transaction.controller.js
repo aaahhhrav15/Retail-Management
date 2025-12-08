@@ -1,4 +1,5 @@
 import * as dataService from '../services/data.service.js';
+import { validateFilters } from '../services/data.service.js';
 
 export const getTransactions = async (req, res) => {
   try {
@@ -76,9 +77,30 @@ export const searchTransactions = async (req, res) => {
     });
 
     const result = await dataService.searchTransactions(filters, page, limit);
+    
+    // Handle no search results gracefully
+    if (!result.data || result.data.length === 0) {
+      return res.json({ 
+        success: true, 
+        ...result,
+        message: 'No transactions found matching your criteria.'
+      });
+    }
+    
     res.json({ success: true, ...result });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    // Check if it's a validation error (400) or server error (500)
+    const statusCode = error.message.includes('Invalid') || error.message.includes('cannot') ? 400 : 500;
+    const errorLimit = parseInt(req.query.limit) || 100;
+    res.status(statusCode).json({ 
+      success: false, 
+      message: error.message || 'An error occurred while searching transactions.',
+      data: [],
+      total: 0,
+      page: 1,
+      limit: errorLimit,
+      totalPages: 0
+    });
   }
 };
 
@@ -114,12 +136,28 @@ export const getStatistics = async (req, res) => {
       }
     });
 
+    // Validate filters before computing statistics
+    if (Object.keys(filters).length > 0) {
+      const validation = validateFilters(filters);
+      if (!validation.valid) {
+        return res.status(400).json({ 
+          success: false, 
+          message: validation.error,
+          data: null
+        });
+      }
+    }
+
     // Pass the filters to statistics - empty filters object means all data
     const hasFilters = Object.keys(filters).length > 0;
     const stats = await dataService.getStatistics(hasFilters ? filters : null);
     res.json({ success: true, data: stats });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'An error occurred while fetching statistics.',
+      data: null
+    });
   }
 };
 

@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [transactions, setTransactions] = useState([])
   const [statistics, setStatistics] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const debounceTimerRef = useRef(null)
@@ -27,7 +28,7 @@ const Dashboard = () => {
   })
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: 10,
     total: 0,
     totalPages: 6
   })
@@ -35,6 +36,7 @@ const Dashboard = () => {
   const loadData = useCallback(async () => {
     try {
       setLoading(true)
+      setError(null) // Clear any previous errors
       
       // Build search filters for API - only include filters that have values
       const searchFilters = {}
@@ -131,29 +133,51 @@ const Dashboard = () => {
           setStatistics(statsData)
         }
       }
-      // Ensure we always set transactions, even if empty array
-      setTransactions(transactionsResponse.data || [])
-      setPagination(prev => ({
-        ...prev,
-        total: transactionsResponse.total || 0,
-        totalPages: transactionsResponse.totalPages || 6
-      }))
+      // Handle no search results
+      if (!transactionsResponse.success) {
+        // API returned an error
+        setTransactions([])
+        setPagination(prev => ({
+          ...prev,
+          total: 0,
+          totalPages: 0
+        }))
+        // Show error message if available
+        const errorMessage = transactionsResponse.message || 'An error occurred while loading transactions.'
+        setError(errorMessage)
+        console.error('API Error:', errorMessage)
+      } else {
+        // Ensure we always set transactions, even if empty array
+        setTransactions(transactionsResponse.data || [])
+        setPagination(prev => ({
+          ...prev,
+          total: transactionsResponse.total || 0,
+          totalPages: transactionsResponse.totalPages || 0
+        }))
+        
+        // Reset to page 1 if current page is beyond available pages
+        if (transactionsResponse.totalPages > 0 && pagination.page > transactionsResponse.totalPages) {
+          setPagination(prev => ({ ...prev, page: 1 }))
+        }
+      }
     } catch (error) {
       console.error('Error loading data:', error)
-      // Don't clear statistics or transactions on error - keep existing data
-      // This prevents showing zeros when there's a temporary network issue or API error
-      // setStatistics({
-      //   totalQuantity: 0,
-      //   totalRevenue: 0,
-      //   totalAmount: 0,
-      //   totalTransactions: 0
-      // })
-      // setTransactions([])
+      // Handle network errors or other exceptions
+      setTransactions([])
       setPagination(prev => ({
         ...prev,
         total: 0,
         totalPages: 0
       }))
+      
+      // Show user-friendly error message
+      let errorMessage = 'An error occurred while loading data. Please try again.'
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -208,6 +232,22 @@ const Dashboard = () => {
       <div className="flex-1 ml-[220px] flex flex-col">
         <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         <div className="p-6 flex-1">
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-red-800">{error}</p>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-red-600 hover:text-red-800"
+                  aria-label="Dismiss error"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
           <Filters
             filters={filters}
             onFilterChange={handleFilterChange}
