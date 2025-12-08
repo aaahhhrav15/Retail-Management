@@ -15,12 +15,12 @@ const Dashboard = () => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
   const debounceTimerRef = useRef(null)
   const [filters, setFilters] = useState({
-    customerRegion: '',
+    customerRegion: [], // Array of selected regions
     gender: '',
     ageFilter: null, // { min, max } or null
-    productCategory: '',
+    productCategory: [], // Array of selected categories
     tags: [], // Array of selected tags
-    paymentMethod: '',
+    paymentMethod: [], // Array of selected payment methods
     dateFilter: null, // { preset, from, to } or null
     sortBy: 'customerName',
     sortOrder: 'asc'
@@ -40,19 +40,19 @@ const Dashboard = () => {
       const searchFilters = {}
       
       // Only add filters if they have actual values
-      if (filters.customerRegion) {
+      if (Array.isArray(filters.customerRegion) && filters.customerRegion.length > 0) {
         searchFilters.customerRegion = filters.customerRegion
       }
       if (filters.gender) {
         searchFilters.gender = filters.gender
       }
-      if (filters.productCategory) {
+      if (Array.isArray(filters.productCategory) && filters.productCategory.length > 0) {
         searchFilters.productCategory = filters.productCategory
       }
       if (Array.isArray(filters.tags) && filters.tags.length > 0) {
         searchFilters.tags = filters.tags
       }
-      if (filters.paymentMethod) {
+      if (Array.isArray(filters.paymentMethod) && filters.paymentMethod.length > 0) {
         searchFilters.paymentMethod = filters.paymentMethod
       }
       

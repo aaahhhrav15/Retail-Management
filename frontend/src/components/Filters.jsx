@@ -81,6 +81,33 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
       onFilterChange('tags', newTags.length > 0 ? newTags : [])
     }
 
+    // Handle customer region checkbox change
+    const handleRegionToggle = (region) => {
+      const currentRegions = Array.isArray(filters.customerRegion) ? filters.customerRegion : (filters.customerRegion ? [filters.customerRegion] : [])
+      const newRegions = currentRegions.includes(region)
+        ? currentRegions.filter(r => r !== region)
+        : [...currentRegions, region]
+      onFilterChange('customerRegion', newRegions.length > 0 ? newRegions : [])
+    }
+
+    // Handle product category checkbox change
+    const handleCategoryToggle = (category) => {
+      const currentCategories = Array.isArray(filters.productCategory) ? filters.productCategory : (filters.productCategory ? [filters.productCategory] : [])
+      const newCategories = currentCategories.includes(category)
+        ? currentCategories.filter(c => c !== category)
+        : [...currentCategories, category]
+      onFilterChange('productCategory', newCategories.length > 0 ? newCategories : [])
+    }
+
+    // Handle payment method checkbox change
+    const handlePaymentToggle = (method) => {
+      const currentMethods = Array.isArray(filters.paymentMethod) ? filters.paymentMethod : (filters.paymentMethod ? [filters.paymentMethod] : [])
+      const newMethods = currentMethods.includes(method)
+        ? currentMethods.filter(m => m !== method)
+        : [...currentMethods, method]
+      onFilterChange('paymentMethod', newMethods.length > 0 ? newMethods : [])
+    }
+
     // Close dropdowns when clicking outside
     useEffect(() => {
       const handleClickOutside = (event) => {
@@ -121,7 +148,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           </svg>
         </button>
         
-        {/* Customer Region Dropdown */}
+        {/* Customer Region Multi-Select Dropdown */}
         <div className="relative" ref={regionDropdownRef}>
           <button
             type="button"
@@ -129,7 +156,9 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
             onClick={() => setRegionDropdownOpen(!regionDropdownOpen)}
           >
             <span className="truncate">
-              {filters.customerRegion || 'Customer Region'}
+              {Array.isArray(filters.customerRegion) && filters.customerRegion.length > 0
+                ? `${filters.customerRegion.length} selected`
+                : 'Customer Region'}
             </span>
             <svg
               className={`w-4 h-4 transition-transform flex-shrink-0 ${regionDropdownOpen ? 'rotate-180' : ''}`}
@@ -143,38 +172,37 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           
           {regionDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 bg-white border border-[#e0e0e0] rounded-md shadow-lg z-50 min-w-[140px] max-h-[300px] overflow-y-auto">
-              <div className="p-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onFilterChange('customerRegion', '')
-                    setRegionDropdownOpen(false)
-                  }}
-                  className={`w-full text-left px-3 py-2 text-xs rounded transition-colors ${
-                    !filters.customerRegion
-                      ? 'bg-[#3b82f6] text-white'
-                      : 'text-[#6b7280] hover:bg-[#f3f4f6]'
-                  }`}
-                >
-                  Customer Region
-                </button>
-                {regions.map(region => (
+              <div className="p-2">
+                {regions.length > 0 ? (
+                  regions.map(region => {
+                    const isSelected = Array.isArray(filters.customerRegion) && filters.customerRegion.includes(region)
+                    return (
+                      <label
+                        key={region}
+                        className="flex items-center gap-2 p-2 hover:bg-[#f3f4f6] rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleRegionToggle(region)}
+                          className="w-4 h-4 text-[#3b82f6] border-[#d1d5db] rounded focus:ring-[#3b82f6] cursor-pointer"
+                        />
+                        <span className="text-xs text-[#374151]">{region}</span>
+                      </label>
+                    )
+                  })
+                ) : (
+                  <div className="p-2 text-xs text-[#6b7280]">No regions available</div>
+                )}
+                {Array.isArray(filters.customerRegion) && filters.customerRegion.length > 0 && (
                   <button
-                    key={region}
                     type="button"
-                    onClick={() => {
-                      onFilterChange('customerRegion', region)
-                      setRegionDropdownOpen(false)
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded transition-colors ${
-                      filters.customerRegion === region
-                        ? 'bg-[#3b82f6] text-white'
-                        : 'text-[#6b7280] hover:bg-[#f3f4f6]'
-                    }`}
+                    onClick={() => onFilterChange('customerRegion', [])}
+                    className="w-full mt-2 pt-2 border-t border-[#e0e0e0] text-xs text-[#ef4444] hover:text-[#dc2626] text-center"
                   >
-                    {region}
+                    Clear all
                   </button>
-                ))}
+                )}
               </div>
             </div>
           )}
@@ -245,7 +273,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           onChange={handleAgeFilterChange}
         />
   
-        {/* Product Category Dropdown */}
+        {/* Product Category Multi-Select Dropdown */}
         <div className="relative" ref={categoryDropdownRef}>
           <button
             type="button"
@@ -253,7 +281,9 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
             onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
           >
             <span className="truncate">
-              {filters.productCategory || 'Product Category'}
+              {Array.isArray(filters.productCategory) && filters.productCategory.length > 0
+                ? `${filters.productCategory.length} selected`
+                : 'Product Category'}
             </span>
             <svg
               className={`w-4 h-4 transition-transform flex-shrink-0 ${categoryDropdownOpen ? 'rotate-180' : ''}`}
@@ -267,38 +297,37 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           
           {categoryDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 bg-white border border-[#e0e0e0] rounded-md shadow-lg z-50 min-w-[150px] max-h-[300px] overflow-y-auto">
-              <div className="p-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onFilterChange('productCategory', '')
-                    setCategoryDropdownOpen(false)
-                  }}
-                  className={`w-full text-left px-3 py-2 text-xs rounded transition-colors ${
-                    !filters.productCategory
-                      ? 'bg-[#3b82f6] text-white'
-                      : 'text-[#6b7280] hover:bg-[#f3f4f6]'
-                  }`}
-                >
-                  Product Category
-                </button>
-                {categories.map(category => (
+              <div className="p-2">
+                {categories.length > 0 ? (
+                  categories.map(category => {
+                    const isSelected = Array.isArray(filters.productCategory) && filters.productCategory.includes(category)
+                    return (
+                      <label
+                        key={category}
+                        className="flex items-center gap-2 p-2 hover:bg-[#f3f4f6] rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleCategoryToggle(category)}
+                          className="w-4 h-4 text-[#3b82f6] border-[#d1d5db] rounded focus:ring-[#3b82f6] cursor-pointer"
+                        />
+                        <span className="text-xs text-[#374151]">{category}</span>
+                      </label>
+                    )
+                  })
+                ) : (
+                  <div className="p-2 text-xs text-[#6b7280]">No categories available</div>
+                )}
+                {Array.isArray(filters.productCategory) && filters.productCategory.length > 0 && (
                   <button
-                    key={category}
                     type="button"
-                    onClick={() => {
-                      onFilterChange('productCategory', category)
-                      setCategoryDropdownOpen(false)
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded transition-colors ${
-                      filters.productCategory === category
-                        ? 'bg-[#3b82f6] text-white'
-                        : 'text-[#6b7280] hover:bg-[#f3f4f6]'
-                    }`}
+                    onClick={() => onFilterChange('productCategory', [])}
+                    className="w-full mt-2 pt-2 border-t border-[#e0e0e0] text-xs text-[#ef4444] hover:text-[#dc2626] text-center"
                   >
-                    {category}
+                    Clear all
                   </button>
-                ))}
+                )}
               </div>
             </div>
           )}
@@ -364,7 +393,7 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           )}
         </div>
   
-        {/* Payment Method Dropdown */}
+        {/* Payment Method Multi-Select Dropdown */}
         <div className="relative" ref={paymentDropdownRef}>
           <button
             type="button"
@@ -372,7 +401,9 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
             onClick={() => setPaymentDropdownOpen(!paymentDropdownOpen)}
           >
             <span className="truncate">
-              {filters.paymentMethod || 'Payment Method'}
+              {Array.isArray(filters.paymentMethod) && filters.paymentMethod.length > 0
+                ? `${filters.paymentMethod.length} selected`
+                : 'Payment Method'}
             </span>
             <svg
               className={`w-4 h-4 transition-transform flex-shrink-0 ${paymentDropdownOpen ? 'rotate-180' : ''}`}
@@ -386,38 +417,37 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
           
           {paymentDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 bg-white border border-[#e0e0e0] rounded-md shadow-lg z-50 min-w-[140px] max-h-[300px] overflow-y-auto">
-              <div className="p-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onFilterChange('paymentMethod', '')
-                    setPaymentDropdownOpen(false)
-                  }}
-                  className={`w-full text-left px-3 py-2 text-xs rounded transition-colors ${
-                    !filters.paymentMethod
-                      ? 'bg-[#3b82f6] text-white'
-                      : 'text-[#6b7280] hover:bg-[#f3f4f6]'
-                  }`}
-                >
-                  Payment Method
-                </button>
-                {paymentMethods.map(method => (
+              <div className="p-2">
+                {paymentMethods.length > 0 ? (
+                  paymentMethods.map(method => {
+                    const isSelected = Array.isArray(filters.paymentMethod) && filters.paymentMethod.includes(method)
+                    return (
+                      <label
+                        key={method}
+                        className="flex items-center gap-2 p-2 hover:bg-[#f3f4f6] rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handlePaymentToggle(method)}
+                          className="w-4 h-4 text-[#3b82f6] border-[#d1d5db] rounded focus:ring-[#3b82f6] cursor-pointer"
+                        />
+                        <span className="text-xs text-[#374151]">{method}</span>
+                      </label>
+                    )
+                  })
+                ) : (
+                  <div className="p-2 text-xs text-[#6b7280]">No payment methods available</div>
+                )}
+                {Array.isArray(filters.paymentMethod) && filters.paymentMethod.length > 0 && (
                   <button
-                    key={method}
                     type="button"
-                    onClick={() => {
-                      onFilterChange('paymentMethod', method)
-                      setPaymentDropdownOpen(false)
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded transition-colors ${
-                      filters.paymentMethod === method
-                        ? 'bg-[#3b82f6] text-white'
-                        : 'text-[#6b7280] hover:bg-[#f3f4f6]'
-                    }`}
+                    onClick={() => onFilterChange('paymentMethod', [])}
+                    className="w-full mt-2 pt-2 border-t border-[#e0e0e0] text-xs text-[#ef4444] hover:text-[#dc2626] text-center"
                   >
-                    {method}
+                    Clear all
                   </button>
-                ))}
+                )}
               </div>
             </div>
           )}

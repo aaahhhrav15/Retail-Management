@@ -108,16 +108,26 @@ function buildQuery(filters) {
   }
 
   // Use exact match for dropdown selections (faster with index)
+  // Handle customerRegion as array (multi-select)
   if (filters.customerRegion) {
-    query.customerRegion = filters.customerRegion;
+    if (Array.isArray(filters.customerRegion) && filters.customerRegion.length > 0) {
+      query.customerRegion = { $in: filters.customerRegion };
+    } else if (typeof filters.customerRegion === 'string') {
+      query.customerRegion = filters.customerRegion;
+    }
   }
 
   if (filters.gender) {
     query.gender = filters.gender;
   }
 
+  // Handle productCategory as array (multi-select)
   if (filters.productCategory) {
-    query.productCategory = filters.productCategory;
+    if (Array.isArray(filters.productCategory) && filters.productCategory.length > 0) {
+      query.productCategory = { $in: filters.productCategory };
+    } else if (typeof filters.productCategory === 'string') {
+      query.productCategory = filters.productCategory;
+    }
   }
 
   if (filters.orderStatus) {
@@ -132,8 +142,13 @@ function buildQuery(filters) {
     query.brand = { $regex: filters.brand, $options: 'i' };
   }
 
+  // Handle paymentMethod as array (multi-select)
   if (filters.paymentMethod) {
-    query.paymentMethod = filters.paymentMethod;
+    if (Array.isArray(filters.paymentMethod) && filters.paymentMethod.length > 0) {
+      query.paymentMethod = { $in: filters.paymentMethod };
+    } else if (typeof filters.paymentMethod === 'string') {
+      query.paymentMethod = filters.paymentMethod;
+    }
   }
 
   // Date filters - date range takes priority over individual date

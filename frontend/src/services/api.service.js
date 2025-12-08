@@ -19,10 +19,19 @@ export const apiService = {
   },
 
   searchTransactions: async (filters = {}, page = 1, limit = 100) => {
-    // Convert tags array to comma-separated string for query params
+    // Convert arrays to comma-separated strings for query params
     const params = { ...filters, page, limit }
     if (Array.isArray(params.tags) && params.tags.length > 0) {
       params.tags = params.tags.join(',')
+    }
+    if (Array.isArray(params.customerRegion) && params.customerRegion.length > 0) {
+      params.customerRegion = params.customerRegion.join(',')
+    }
+    if (Array.isArray(params.productCategory) && params.productCategory.length > 0) {
+      params.productCategory = params.productCategory.join(',')
+    }
+    if (Array.isArray(params.paymentMethod) && params.paymentMethod.length > 0) {
+      params.paymentMethod = params.paymentMethod.join(',')
     }
     const response = await apiClient.get('/transactions/search', { params })
     return response.data
@@ -34,10 +43,19 @@ export const apiService = {
   },
 
   getStatistics: async (filters = {}) => {
-    // Convert tags array to comma-separated string for query params
+    // Convert arrays to comma-separated strings for query params
     const params = { ...filters }
     if (Array.isArray(params.tags) && params.tags.length > 0) {
       params.tags = params.tags.join(',')
+    }
+    if (Array.isArray(params.customerRegion) && params.customerRegion.length > 0) {
+      params.customerRegion = params.customerRegion.join(',')
+    }
+    if (Array.isArray(params.productCategory) && params.productCategory.length > 0) {
+      params.productCategory = params.productCategory.join(',')
+    }
+    if (Array.isArray(params.paymentMethod) && params.paymentMethod.length > 0) {
+      params.paymentMethod = params.paymentMethod.join(',')
     }
     const response = await apiClient.get('/transactions/statistics', {
       params

@@ -9,6 +9,36 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Prevent default browser tooltip for elements with title attribute
+      document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('mouseover', function(e) {
+          let element = e.target;
+          // Check if element or its parent has title attribute
+          while (element && element !== document.body) {
+            if (element.hasAttribute('title') && !element.dataset.titleBackup) {
+              element.dataset.titleBackup = element.title;
+              element.removeAttribute('title');
+              break;
+            }
+            element = element.parentElement;
+          }
+        });
+        
+        document.addEventListener('mouseout', function(e) {
+          let element = e.target;
+          // Check if element or its parent has title backup
+          while (element && element !== document.body) {
+            if (element.dataset.titleBackup) {
+              element.title = element.dataset.titleBackup;
+              delete element.dataset.titleBackup;
+              break;
+            }
+            element = element.parentElement;
+          }
+        });
+      });
+    </script>
   </body>
 </html>
 

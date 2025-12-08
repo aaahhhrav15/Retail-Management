@@ -39,7 +39,7 @@ export const searchTransactions = async (req, res) => {
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 100;
     
-    // Validate page and limit
+    // For validating the page and limit
     page = Math.max(1, page); // Ensure page is at least 1
     limit = Math.max(1, Math.min(limit, 1000)); // Ensure limit is between 1 and 1000
     
@@ -48,15 +48,15 @@ export const searchTransactions = async (req, res) => {
       customerId: req.query.customerId,
       customerName: req.query.customerName,
       phoneNumber: req.query.phoneNumber,
-      customerRegion: req.query.customerRegion,
+      customerRegion: req.query.customerRegion ? (Array.isArray(req.query.customerRegion) ? req.query.customerRegion : req.query.customerRegion.split(',')) : undefined,
       gender: req.query.gender,
       ageRange: req.query.ageRange,
-      productCategory: req.query.productCategory,
+      productCategory: req.query.productCategory ? (Array.isArray(req.query.productCategory) ? req.query.productCategory : req.query.productCategory.split(',')) : undefined,
       tags: req.query.tags ? (Array.isArray(req.query.tags) ? req.query.tags : req.query.tags.split(',')) : undefined,
       orderStatus: req.query.orderStatus,
       storeId: req.query.storeId,
       brand: req.query.brand,
-      paymentMethod: req.query.paymentMethod,
+      paymentMethod: req.query.paymentMethod ? (Array.isArray(req.query.paymentMethod) ? req.query.paymentMethod : req.query.paymentMethod.split(',')) : undefined,
       date: req.query.date,
       dateFrom: req.query.dateFrom,
       dateTo: req.query.dateTo,
@@ -70,6 +70,8 @@ export const searchTransactions = async (req, res) => {
     Object.keys(filters).forEach(key => {
       if (filters[key] === undefined || filters[key] === '' || filters[key] === null) {
         delete filters[key];
+      } else if (Array.isArray(filters[key]) && filters[key].length === 0) {
+        delete filters[key];
       }
     });
 
@@ -82,20 +84,20 @@ export const searchTransactions = async (req, res) => {
 
 export const getStatistics = async (req, res) => {
   try {
-    // Extract filter parameters from query string (same as searchTransactions)
+    // Extract filter parameters from the query string 
     const filters = {
       customerId: req.query.customerId,
       customerName: req.query.customerName,
       phoneNumber: req.query.phoneNumber,
-      customerRegion: req.query.customerRegion,
+      customerRegion: req.query.customerRegion ? (Array.isArray(req.query.customerRegion) ? req.query.customerRegion : req.query.customerRegion.split(',')) : undefined,
       gender: req.query.gender,
       ageRange: req.query.ageRange,
-      productCategory: req.query.productCategory,
+      productCategory: req.query.productCategory ? (Array.isArray(req.query.productCategory) ? req.query.productCategory : req.query.productCategory.split(',')) : undefined,
       tags: req.query.tags ? (Array.isArray(req.query.tags) ? req.query.tags : req.query.tags.split(',')) : undefined,
       orderStatus: req.query.orderStatus,
       storeId: req.query.storeId,
       brand: req.query.brand,
-      paymentMethod: req.query.paymentMethod,
+      paymentMethod: req.query.paymentMethod ? (Array.isArray(req.query.paymentMethod) ? req.query.paymentMethod : req.query.paymentMethod.split(',')) : undefined,
       date: req.query.date,
       dateFrom: req.query.dateFrom,
       dateTo: req.query.dateTo,
@@ -107,10 +109,12 @@ export const getStatistics = async (req, res) => {
     Object.keys(filters).forEach(key => {
       if (filters[key] === undefined || filters[key] === '' || filters[key] === null) {
         delete filters[key];
+      } else if (Array.isArray(filters[key]) && filters[key].length === 0) {
+        delete filters[key];
       }
     });
 
-    // Pass filters to statistics - empty filters object means all data
+    // Pass the filters to statistics - empty filters object means all data
     const hasFilters = Object.keys(filters).length > 0;
     const stats = await dataService.getStatistics(hasFilters ? filters : null);
     res.json({ success: true, data: stats });

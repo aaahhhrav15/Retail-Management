@@ -20,20 +20,14 @@ body {
   min-height: 100vh;
 }
 
-[title] {
+[title],
+[data-title-backup] {
   position: relative;
   cursor: help;
 }
 
-[title]:hover::before {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 0;
-  transition-delay: 1s;
-}
-
-[title]:hover::after {
+[title]::after,
+[data-title-backup]::after {
   content: attr(title);
   position: absolute;
   background: #1f2937;
@@ -49,9 +43,17 @@ body {
   transform: translateX(-50%);
   margin-bottom: 5px;
   opacity: 0;
-  transition: opacity 0.2s 2s;
+  visibility: hidden;
+  transition: opacity 0.2s ease-in-out 0.5s, visibility 0s linear 0.5s;
 }
 
-[title]:hover::after {
+[title]:hover::after,
+[data-title-backup]:hover::after {
   opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease-in-out 0.5s, visibility 0s linear 0s;
+}
+
+[data-title-backup]::after {
+  content: attr(data-title-backup);
 }
