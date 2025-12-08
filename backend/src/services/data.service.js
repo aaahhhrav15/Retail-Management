@@ -181,9 +181,21 @@ function buildQuery(filters) {
     }
   }
 
-  // Tags filter - use $in for exact match or $elemMatch for partial
+  // Tags filter - support multiple tags (array or comma-separated string)
   if (filters.tags) {
-    query.tags = { $elemMatch: { $regex: filters.tags, $options: 'i' } };
+    // Handle both array and comma-separated string formats
+    let tagArray = [];
+    if (Array.isArray(filters.tags)) {
+      tagArray = filters.tags.filter(tag => tag && tag.trim());
+    } else if (typeof filters.tags === 'string') {
+      tagArray = filters.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+    }
+    
+    if (tagArray.length > 0) {
+      // Use $in to match any of the selected tags (OR logic)
+      // This means a transaction matches if it has ANY of the selected tags
+      query.tags = { $in: tagArray };
+    }
   }
 
   return query;

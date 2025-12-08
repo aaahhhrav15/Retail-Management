@@ -19,7 +19,7 @@ const Dashboard = () => {
     gender: '',
     ageFilter: null, // { min, max } or null
     productCategory: '',
-    tags: '',
+    tags: [], // Array of selected tags
     paymentMethod: '',
     dateFilter: null, // { preset, from, to } or null
     sortBy: 'customerName',
@@ -36,16 +36,29 @@ const Dashboard = () => {
     try {
       setLoading(true)
       
-      // Build search filters for API
-      const searchFilters = {
-        customerRegion: filters.customerRegion || undefined,
-        gender: filters.gender || undefined,
-        productCategory: filters.productCategory || undefined,
-        tags: filters.tags || undefined,
-        paymentMethod: filters.paymentMethod || undefined,
-        sortBy: filters.sortBy || 'customerName',
-        sortOrder: filters.sortOrder || 'asc'
+      // Build search filters for API - only include filters that have values
+      const searchFilters = {}
+      
+      // Only add filters if they have actual values
+      if (filters.customerRegion) {
+        searchFilters.customerRegion = filters.customerRegion
       }
+      if (filters.gender) {
+        searchFilters.gender = filters.gender
+      }
+      if (filters.productCategory) {
+        searchFilters.productCategory = filters.productCategory
+      }
+      if (Array.isArray(filters.tags) && filters.tags.length > 0) {
+        searchFilters.tags = filters.tags
+      }
+      if (filters.paymentMethod) {
+        searchFilters.paymentMethod = filters.paymentMethod
+      }
+      
+      // Always include sort parameters (defaults if not set)
+      searchFilters.sortBy = filters.sortBy || 'customerName'
+      searchFilters.sortOrder = filters.sortOrder || 'asc'
       
       // Handle age filter - convert to backend format
       if (filters.ageFilter && (filters.ageFilter.min !== null || filters.ageFilter.max !== null)) {
@@ -95,6 +108,7 @@ const Dashboard = () => {
       ])
 
       setStatistics(statsResponse.data)
+      // Ensure we always set transactions, even if empty array
       setTransactions(transactionsResponse.data || [])
       setPagination(prev => ({
         ...prev,
@@ -110,7 +124,8 @@ const Dashboard = () => {
         totalAmount: 0,
         totalTransactions: 0
       })
-      setTransactions([])
+      // Don't clear transactions on error - keep existing data
+      // setTransactions([])
       setPagination(prev => ({
         ...prev,
         total: 0,
@@ -144,9 +159,12 @@ const Dashboard = () => {
 
   // Reset page to 1 when filters or debounced search change
   useEffect(() => {
-    if (pagination.page !== 1) {
-      setPagination(prev => ({ ...prev, page: 1 }))
-    }
+    setPagination(prev => {
+      if (prev.page !== 1) {
+        return { ...prev, page: 1 }
+      }
+      return prev
+    })
   }, [filters, debouncedSearchQuery])
 
   const handleFilterChange = (key, value) => {

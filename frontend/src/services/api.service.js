@@ -19,9 +19,12 @@ export const apiService = {
   },
 
   searchTransactions: async (filters = {}, page = 1, limit = 100) => {
-    const response = await apiClient.get('/transactions/search', {
-      params: { ...filters, page, limit }
-    })
+    // Convert tags array to comma-separated string for query params
+    const params = { ...filters, page, limit }
+    if (Array.isArray(params.tags) && params.tags.length > 0) {
+      params.tags = params.tags.join(',')
+    }
+    const response = await apiClient.get('/transactions/search', { params })
     return response.data
   },
 
@@ -31,8 +34,13 @@ export const apiService = {
   },
 
   getStatistics: async (filters = {}) => {
+    // Convert tags array to comma-separated string for query params
+    const params = { ...filters }
+    if (Array.isArray(params.tags) && params.tags.length > 0) {
+      params.tags = params.tags.join(',')
+    }
     const response = await apiClient.get('/transactions/statistics', {
-      params: filters
+      params
     })
     return response.data
   },
