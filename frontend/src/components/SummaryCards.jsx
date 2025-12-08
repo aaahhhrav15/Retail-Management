@@ -21,7 +21,7 @@ const SummaryCards = ({ statistics }) => {
                 </svg>
               </button>
             </div>
-            <div className="text-2xl font-semibold text-[#1a1a1a]">0</div>
+            <div className="text-xl font-semibold text-[#1a1a1a]">0</div>
           </div>
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
             <div className="flex items-center justify-between mb-2">
@@ -32,8 +32,8 @@ const SummaryCards = ({ statistics }) => {
                 </svg>
               </button>
             </div>
-            <div className="text-2xl font-semibold text-[#1a1a1a]">
-              ₹0 <span className="text-sm text-[#6b7280] font-normal">(0 SRs)</span>
+            <div className="text-xl font-semibold text-[#1a1a1a]">
+              ₹0 <span className="text-xs text-[#6b7280] font-normal">(0 SRs)</span>
             </div>
           </div>
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
@@ -45,8 +45,8 @@ const SummaryCards = ({ statistics }) => {
                 </svg>
               </button>
             </div>
-            <div className="text-2xl font-semibold text-[#1a1a1a]">
-              ₹0 <span className="text-sm text-[#6b7280] font-normal">(0 SRs)</span>
+            <div className="text-xl font-semibold text-[#1a1a1a]">
+              ₹0 <span className="text-xs text-[#6b7280] font-normal">(0 SRs)</span>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@ const SummaryCards = ({ statistics }) => {
               </svg>
             </button>
           </div>
-          <div className="text-2xl font-semibold text-[#1a1a1a]">
+          <div className="text-xl font-semibold text-[#1a1a1a]">
             {formatNumber(statistics.totalQuantity || 0)}
           </div>
         </div>
@@ -81,9 +81,9 @@ const SummaryCards = ({ statistics }) => {
               </svg>
             </button>
           </div>
-          <div className="text-2xl font-semibold text-[#1a1a1a]">
+          <div className="text-xl font-semibold text-[#1a1a1a]">
             {formatCurrency(statistics.totalRevenue || 0)}
-            <span className="text-sm text-[#6b7280] font-normal ml-1">
+            <span className="text-xs text-[#6b7280] font-normal ml-1">
               ({statistics.totalTransactions || 0} SRs)
             </span>
           </div>
@@ -97,9 +97,9 @@ const SummaryCards = ({ statistics }) => {
               </svg>
             </button>
           </div>
-          <div className="text-2xl font-semibold text-[#1a1a1a]">
+          <div className="text-xl font-semibold text-[#1a1a1a]">
             {formatCurrency(totalDiscount)}
-            <span className="text-sm text-[#6b7280] font-normal ml-1">
+            <span className="text-xs text-[#6b7280] font-normal ml-1">
               ({statistics.totalTransactions || 0} SRs)
             </span>
           </div>
