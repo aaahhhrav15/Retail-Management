@@ -107,7 +107,20 @@ const Dashboard = () => {
         )
       ])
 
-      setStatistics(statsResponse.data)
+      // Only update statistics if we got valid data with actual values
+      if (statsResponse && statsResponse.data) {
+        const statsData = statsResponse.data
+        // Validate that we have meaningful statistics data before updating
+        // This prevents setting statistics to null or empty objects
+        if (statsData && typeof statsData === 'object' && (
+          statsData.totalQuantity !== undefined ||
+          statsData.totalRevenue !== undefined ||
+          statsData.totalAmount !== undefined ||
+          statsData.totalTransactions !== undefined
+        )) {
+          setStatistics(statsData)
+        }
+      }
       // Ensure we always set transactions, even if empty array
       setTransactions(transactionsResponse.data || [])
       setPagination(prev => ({
@@ -117,14 +130,14 @@ const Dashboard = () => {
       }))
     } catch (error) {
       console.error('Error loading data:', error)
-      // Set empty statistics when API fails
-      setStatistics({
-        totalQuantity: 0,
-        totalRevenue: 0,
-        totalAmount: 0,
-        totalTransactions: 0
-      })
-      // Don't clear transactions on error - keep existing data
+      // Don't clear statistics or transactions on error - keep existing data
+      // This prevents showing zeros when there's a temporary network issue or API error
+      // setStatistics({
+      //   totalQuantity: 0,
+      //   totalRevenue: 0,
+      //   totalAmount: 0,
+      //   totalTransactions: 0
+      // })
       // setTransactions([])
       setPagination(prev => ({
         ...prev,
@@ -190,7 +203,7 @@ const Dashboard = () => {
             onFilterChange={handleFilterChange}
             onRefresh={handleRefresh}
           />
-          <SummaryCards statistics={statistics} />
+          <SummaryCards statistics={statistics} loading={loading} />
           <TransactionsTable transactions={transactions} loading={loading} />
           <Pagination
             currentPage={pagination.page}

@@ -1,15 +1,31 @@
-const SummaryCards = ({ statistics }) => {
+const SummaryCards = ({ statistics, loading = false }) => {
     const formatCurrency = (amount) => {
-      if (!amount) return '₹0'
+      if (!amount && amount !== 0) return '-'
       return `₹${amount.toLocaleString('en-IN')}`
     }
   
     const formatNumber = (num) => {
-      if (!num) return '0'
+      if (!num && num !== 0) return '-'
       return num.toLocaleString('en-IN')
     }
   
+    // Show loading state or placeholder when statistics are not available
     if (!statistics) {
+      if (loading) {
+        return (
+          <div className="flex gap-4 mb-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-[#6b7280]">Loading...</span>
+                </div>
+                <div className="text-xl font-semibold text-[#1a1a1a] animate-pulse">-</div>
+              </div>
+            ))}
+          </div>
+        )
+      }
+      // Don't show zeros when statistics are not loaded yet - show placeholder
       return (
         <div className="flex gap-4 mb-6">
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
@@ -21,7 +37,7 @@ const SummaryCards = ({ statistics }) => {
                 </svg>
               </button>
             </div>
-            <div className="text-xl font-semibold text-[#1a1a1a]">0</div>
+            <div className="text-xl font-semibold text-[#1a1a1a]">-</div>
           </div>
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
             <div className="flex items-center justify-between mb-2">
@@ -33,7 +49,7 @@ const SummaryCards = ({ statistics }) => {
               </button>
             </div>
             <div className="text-xl font-semibold text-[#1a1a1a]">
-              ₹0 <span className="text-xs text-[#6b7280] font-normal">(0 SRs)</span>
+              - <span className="text-xs text-[#6b7280] font-normal">(- SRs)</span>
             </div>
           </div>
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
@@ -46,7 +62,7 @@ const SummaryCards = ({ statistics }) => {
               </button>
             </div>
             <div className="text-xl font-semibold text-[#1a1a1a]">
-              ₹0 <span className="text-xs text-[#6b7280] font-normal">(0 SRs)</span>
+              - <span className="text-xs text-[#6b7280] font-normal">(- SRs)</span>
             </div>
           </div>
         </div>
