@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import routes from './routes/index.js';
-import { loadDataFromCSV, isDataLoaded } from './services/data.service.js';
+import transactionRoutes from './routes/transaction.routes.js';
+import { initializeDataService, isDataLoaded, getDataCount } from './services/data.service.js';
 
 dotenv.config();
 
@@ -14,29 +14,31 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Load CSV data into memory on startup
+// Initialize database connection and data service
 async function initializeServer() {
   try {
-    console.log('Loading dataset into memory...');
-    await loadDataFromCSV();
-    console.log('Dataset loaded successfully into memory');
+    console.log('Initializing database connection...');
+    await initializeDataService();
+    const count = await getDataCount();
+    console.log(`Database initialized successfully. Total transactions: ${count}`);
   } catch (error) {
-    console.error('Failed to load dataset:', error);
+    console.error('Failed to initialize database:', error);
     process.exit(1);
   }
 }
 
 // Routes
-app.use('/api', routes);
+app.use('/api/transactions', transactionRoutes);
 
 // Health check route
 app.get('/health', async (req, res) => {
   const dataLoaded = isDataLoaded();
+  const count = dataLoaded ? await getDataCount() : 0;
   res.json({ 
     status: 'OK', 
     message: 'Server is running',
     dataLoaded: dataLoaded,
-    dataCount: dataLoaded ? (await import('./services/data.service.js')).getDataCount() : 0
+    dataCount: count
   });
 });
 

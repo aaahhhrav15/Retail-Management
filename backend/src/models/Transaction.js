@@ -118,10 +118,22 @@ const transactionSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create indexes for common query patterns
+// Create indexes for common query patterns and performance optimization
+// Composite indexes for common filter combinations (order matters - most selective first)
 transactionSchema.index({ date: -1, customerRegion: 1 });
 transactionSchema.index({ productCategory: 1, orderStatus: 1 });
 transactionSchema.index({ storeId: 1, date: -1 });
+transactionSchema.index({ customerRegion: 1, gender: 1, productCategory: 1 });
+transactionSchema.index({ productCategory: 1, paymentMethod: 1 });
+transactionSchema.index({ customerRegion: 1, date: -1 });
+
+// Single field indexes for individual filters
+transactionSchema.index({ customerName: 'text', phoneNumber: 'text' }); // Text search index
+transactionSchema.index({ finalAmount: 1 }); // Sorting by amount
+transactionSchema.index({ age: 1 }); // Age range filtering
+transactionSchema.index({ tags: 1 }); // Tags filtering
+transactionSchema.index({ customerName: 1 }); // For sorting by customerName
+transactionSchema.index({ date: -1 }); // Default date sorting
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 

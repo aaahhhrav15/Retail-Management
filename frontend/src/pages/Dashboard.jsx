@@ -17,11 +17,11 @@ const Dashboard = () => {
   const [filters, setFilters] = useState({
     customerRegion: '',
     gender: '',
-    ageRange: '',
+    ageFilter: null, // { min, max } or null
     productCategory: '',
     tags: '',
     paymentMethod: '',
-    date: '',
+    dateFilter: null, // { preset, from, to } or null
     sortBy: 'customerName',
     sortOrder: 'asc'
   })
@@ -36,8 +36,42 @@ const Dashboard = () => {
     try {
       setLoading(true)
       
-      // Build search filters
-      const searchFilters = { ...filters }
+      // Build search filters for API
+      const searchFilters = {
+        customerRegion: filters.customerRegion || undefined,
+        gender: filters.gender || undefined,
+        productCategory: filters.productCategory || undefined,
+        tags: filters.tags || undefined,
+        paymentMethod: filters.paymentMethod || undefined,
+        sortBy: filters.sortBy || 'customerName',
+        sortOrder: filters.sortOrder || 'asc'
+      }
+      
+      // Handle age filter - convert to backend format
+      if (filters.ageFilter && (filters.ageFilter.min !== null || filters.ageFilter.max !== null)) {
+        const { min, max } = filters.ageFilter
+        if (min !== null && max !== null) {
+          searchFilters.ageRange = `${min}-${max}`
+        } else if (min !== null) {
+          searchFilters.ageRange = `${min}+`
+        } else if (max !== null) {
+          searchFilters.ageRange = `0-${max}`
+        }
+      }
+      
+      // Handle date filter - convert to backend format
+      if (filters.dateFilter && filters.dateFilter.preset) {
+        const { preset, from, to } = filters.dateFilter
+        if (preset === 'custom') {
+          if (from) searchFilters.dateFrom = from
+          if (to) searchFilters.dateTo = to
+        } else if (preset === 'today') {
+          searchFilters.date = from
+        } else if (preset === 'last7days' || preset === 'last30days' || preset === 'thisMonth') {
+          if (from) searchFilters.dateFrom = from
+          if (to) searchFilters.dateTo = to
+        }
+      }
       
       // Handle search query (use debounced version)
       if (debouncedSearchQuery.trim()) {
@@ -50,8 +84,9 @@ const Dashboard = () => {
       }
 
       // Make API calls in parallel for better performance
+      // Pass same filters to statistics so it shows filtered stats
       const [statsResponse, transactionsResponse] = await Promise.all([
-        apiService.getStatistics(),
+        apiService.getStatistics(searchFilters),
         apiService.searchTransactions(
           searchFilters,
           pagination.page,
@@ -68,13 +103,19 @@ const Dashboard = () => {
       }))
     } catch (error) {
       console.error('Error loading data:', error)
-      // Set some default data if API fails
+      // Set empty statistics when API fails
       setStatistics({
-        totalQuantity: 10,
-        totalRevenue: 89000,
-        totalAmount: 104000,
-        totalTransactions: 19
+        totalQuantity: 0,
+        totalRevenue: 0,
+        totalAmount: 0,
+        totalTransactions: 0
       })
+      setTransactions([])
+      setPagination(prev => ({
+        ...prev,
+        total: 0,
+        totalPages: 0
+      }))
     } finally {
       setLoading(false)
     }

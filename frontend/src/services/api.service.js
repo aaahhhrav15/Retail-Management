@@ -30,8 +30,10 @@ export const apiService = {
     return response.data
   },
 
-  getStatistics: async () => {
-    const response = await apiClient.get('/transactions/statistics')
+  getStatistics: async (filters = {}) => {
+    const response = await apiClient.get('/transactions/statistics', {
+      params: filters
+    })
     return response.data
   },
 

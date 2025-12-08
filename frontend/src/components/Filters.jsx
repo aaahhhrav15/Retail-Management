@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { apiService } from '../services/api.service'
+import AgeRangeFilter from './AgeRangeFilter'
+import DateRangeFilter from './DateRangeFilter'
 
 const Filters = ({ filters, onFilterChange, onRefresh }) => {
     const [filterOptions, setFilterOptions] = useState({
@@ -35,7 +37,6 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
 
     const regions = ['Customer Region', ...filterOptions.customerRegions]
     const genders = ['Gender', ...filterOptions.genders]
-    const ageRanges = ['Age Range', '18-25', '26-35', '36-45', '46-55', '56+']
     const categories = ['Product Category', ...filterOptions.productCategories]
     const tags = ['Tags', ...filterOptions.tags]
     const paymentMethods = ['Payment Method', ...filterOptions.paymentMethods]
@@ -47,9 +48,19 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
       { value: 'finalAmount', label: 'Sort by: Amount (High to Low)' },
       { value: '-finalAmount', label: 'Sort by: Amount (Low to High)' }
     ]
+
+    // Handle age filter change
+    const handleAgeFilterChange = (ageFilter) => {
+      onFilterChange('ageFilter', ageFilter)
+    }
+
+    // Handle date filter change
+    const handleDateFilterChange = (dateFilter) => {
+      onFilterChange('dateFilter', dateFilter)
+    }
   
     return (
-      <div className="flex gap-2 mb-6 items-center flex-wrap">
+      <div className="flex gap-2 mb-6 items-start flex-wrap">
         <button 
           className="p-2 border border-[#e0e0e0] rounded-md bg-white cursor-pointer transition-all hover:bg-[#f3f4f6]"
           onClick={onRefresh} 
@@ -77,16 +88,6 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
         >
           {genders.map(gender => (
             <option key={gender} value={gender}>{gender}</option>
-          ))}
-        </select>
-  
-        <select
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none min-w-[120px] text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
-          value={filters.ageRange || 'Age Range'}
-          onChange={(e) => onFilterChange('ageRange', e.target.value === 'Age Range' ? '' : e.target.value)}
-        >
-          {ageRanges.map(range => (
-            <option key={range} value={range}>{range}</option>
           ))}
         </select>
   
@@ -119,13 +120,17 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
             <option key={method} value={method}>{method}</option>
           ))}
         </select>
-  
-        <input
-          type="date"
-          className="py-2 px-3 border border-[#e0e0e0] rounded-md text-sm bg-white cursor-pointer outline-none text-[#6b7280] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]/20"
-          value={filters.date || ''}
-          onChange={(e) => onFilterChange('date', e.target.value)}
-          placeholder="Date"
+
+        {/* Age Range Filter */}
+        <AgeRangeFilter
+          value={filters.ageFilter || null}
+          onChange={handleAgeFilterChange}
+        />
+
+        {/* Date Range Filter */}
+        <DateRangeFilter
+          value={filters.dateFilter || null}
+          onChange={handleDateFilterChange}
         />
   
         <select

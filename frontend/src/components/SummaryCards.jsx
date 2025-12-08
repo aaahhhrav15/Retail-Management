@@ -21,7 +21,7 @@ const SummaryCards = ({ statistics }) => {
                 </svg>
               </button>
             </div>
-            <div className="text-2xl font-semibold text-[#1a1a1a]">10</div>
+            <div className="text-2xl font-semibold text-[#1a1a1a]">0</div>
           </div>
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
             <div className="flex items-center justify-between mb-2">
@@ -33,7 +33,7 @@ const SummaryCards = ({ statistics }) => {
               </button>
             </div>
             <div className="text-2xl font-semibold text-[#1a1a1a]">
-              ₹89,000 <span className="text-sm text-[#6b7280] font-normal">(19 SRs)</span>
+              ₹0 <span className="text-sm text-[#6b7280] font-normal">(0 SRs)</span>
             </div>
           </div>
           <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
@@ -46,7 +46,7 @@ const SummaryCards = ({ statistics }) => {
               </button>
             </div>
             <div className="text-2xl font-semibold text-[#1a1a1a]">
-              ₹15000 <span className="text-sm text-[#6b7280] font-normal">(45 SRs)</span>
+              ₹0 <span className="text-sm text-[#6b7280] font-normal">(0 SRs)</span>
             </div>
           </div>
         </div>
@@ -69,7 +69,7 @@ const SummaryCards = ({ statistics }) => {
             </button>
           </div>
           <div className="text-2xl font-semibold text-[#1a1a1a]">
-            {formatNumber(statistics.totalQuantity || 10)}
+            {formatNumber(statistics.totalQuantity || 0)}
           </div>
         </div>
         <div className="bg-white border border-[#e0e0e0] rounded-lg p-4 w-fit">
@@ -82,9 +82,9 @@ const SummaryCards = ({ statistics }) => {
             </button>
           </div>
           <div className="text-2xl font-semibold text-[#1a1a1a]">
-            {formatCurrency(statistics.totalRevenue || 89000)}
+            {formatCurrency(statistics.totalRevenue || 0)}
             <span className="text-sm text-[#6b7280] font-normal ml-1">
-              ({statistics.totalTransactions || 19} SRs)
+              ({statistics.totalTransactions || 0} SRs)
             </span>
           </div>
         </div>
@@ -98,8 +98,10 @@ const SummaryCards = ({ statistics }) => {
             </button>
           </div>
           <div className="text-2xl font-semibold text-[#1a1a1a]">
-            {formatCurrency(totalDiscount || 15000)}
-            <span className="text-sm text-[#6b7280] font-normal ml-1">(45 SRs)</span>
+            {formatCurrency(totalDiscount)}
+            <span className="text-sm text-[#6b7280] font-normal ml-1">
+              ({statistics.totalTransactions || 0} SRs)
+            </span>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import * as dataService from '../services/data.service.js';
 
-export const getTransactions = (req, res) => {
+export const getTransactions = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 100;
@@ -9,17 +9,17 @@ export const getTransactions = (req, res) => {
     page = Math.max(1, page); // Ensure page is at least 1
     limit = Math.max(1, Math.min(limit, 1000)); // Ensure limit is between 1 and 1000
     
-    const result = dataService.getAllTransactions(page, limit);
+    const result = await dataService.getAllTransactions(page, limit);
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getTransactionById = (req, res) => {
+export const getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
-    const transaction = dataService.getTransactionById(id);
+    const transaction = await dataService.getTransactionById(id);
     
     if (!transaction) {
       return res.status(404).json({ 
@@ -34,7 +34,7 @@ export const getTransactionById = (req, res) => {
   }
 };
 
-export const searchTransactions = (req, res) => {
+export const searchTransactions = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 100;
@@ -73,25 +73,55 @@ export const searchTransactions = (req, res) => {
       }
     });
 
-    const result = dataService.searchTransactions(filters, page, limit);
+    const result = await dataService.searchTransactions(filters, page, limit);
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getStatistics = (req, res) => {
+export const getStatistics = async (req, res) => {
   try {
-    const stats = dataService.getStatistics();
+    // Extract filter parameters from query string (same as searchTransactions)
+    const filters = {
+      customerId: req.query.customerId,
+      customerName: req.query.customerName,
+      phoneNumber: req.query.phoneNumber,
+      customerRegion: req.query.customerRegion,
+      gender: req.query.gender,
+      ageRange: req.query.ageRange,
+      productCategory: req.query.productCategory,
+      tags: req.query.tags,
+      orderStatus: req.query.orderStatus,
+      storeId: req.query.storeId,
+      brand: req.query.brand,
+      paymentMethod: req.query.paymentMethod,
+      date: req.query.date,
+      dateFrom: req.query.dateFrom,
+      dateTo: req.query.dateTo,
+      minAmount: req.query.minAmount,
+      maxAmount: req.query.maxAmount
+    };
+
+    // Remove undefined or empty string filters
+    Object.keys(filters).forEach(key => {
+      if (filters[key] === undefined || filters[key] === '' || filters[key] === null) {
+        delete filters[key];
+      }
+    });
+
+    // Pass filters to statistics - empty filters object means all data
+    const hasFilters = Object.keys(filters).length > 0;
+    const stats = await dataService.getStatistics(hasFilters ? filters : null);
     res.json({ success: true, data: stats });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getFilterOptions = (req, res) => {
+export const getFilterOptions = async (req, res) => {
   try {
-    const filterOptions = dataService.getUniqueFilterValues();
+    const filterOptions = await dataService.getUniqueFilterValues();
     res.json({ success: true, data: filterOptions });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
