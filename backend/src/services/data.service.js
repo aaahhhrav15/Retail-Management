@@ -97,14 +97,48 @@ function buildQuery(filters) {
     query.customerId = filters.customerId;
   }
 
-  // Use exact match for better index usage when possible
-  if (filters.customerName) {
-    // Use case-insensitive regex for partial matching (for search functionality)
-    query.customerName = { $regex: filters.customerName, $options: 'i' };
-  }
+  // Handle search queries - if both customerName and phoneNumber are provided,
+  // use OR logic to match either field (for general search functionality)
+  // Otherwise, use AND logic for explicit filters
+  const hasNameSearch = filters.customerName && filters.customerName.trim();
+  const hasPhoneSearch = filters.phoneNumber && filters.phoneNumber.trim();
+  
+  if (hasNameSearch && hasPhoneSearch) {
+    // Both provided - use OR logic for search (match either name OR phone)
+    const escapedName = filters.customerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const cleanedPhone = filters.phoneNumber.replace(/\D/g, '');
+    
+    if (cleanedPhone) {
+      const escapedPhone = cleanedPhone.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // Use $or to match either customerName OR phoneNumber
+      if (!query.$or) query.$or = [];
+      query.$or.push(
+        { customerName: { $regex: escapedName, $options: 'i' } },
+        { phoneNumber: { $regex: escapedPhone, $options: 'i' } }
+      );
+    } else {
+      // Only name search if phone cleaning resulted in empty string
+      query.customerName = { $regex: escapedName, $options: 'i' };
+    }
+  } else {
+    // Only one provided - use individual field matching
+    if (hasNameSearch) {
+      // Escape special regex characters for accurate matching
+      // Use case-insensitive regex for partial matching (for search functionality)
+      const escapedName = filters.customerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.customerName = { $regex: escapedName, $options: 'i' };
+    }
 
-  if (filters.phoneNumber) {
-    query.phoneNumber = { $regex: filters.phoneNumber };
+    if (hasPhoneSearch) {
+      // Escape special regex characters and make case-insensitive for consistency
+      // Remove non-digit characters for phone number matching (handles +91, spaces, etc.)
+      const cleanedPhone = filters.phoneNumber.replace(/\D/g, '');
+      if (cleanedPhone) {
+        const escapedPhone = cleanedPhone.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Match phone numbers that contain the cleaned digits (handles +91 prefix, spaces, etc.)
+        query.phoneNumber = { $regex: escapedPhone, $options: 'i' };
+      }
+    }
   }
 
   // Use exact match for dropdown selections (faster with index)
@@ -227,6 +261,12 @@ function buildSort(sortBy, sortOrder) {
     sort.date = order;
   } else if (sortBy === 'finalAmount') {
     sort.finalAmount = order;
+  } else if (sortBy === 'quantity') {
+    sort.quantity = order;
+  } else if (sortBy === 'age') {
+    sort.age = order;
+  } else if (sortBy === 'transactionId') {
+    sort.transactionId = order;
   } else if (sortBy === 'customerName') {
     sort.customerName = order;
   } else {
@@ -536,8 +576,13 @@ async function computeFilterOptions() {
     Transaction.distinct('tags')
   ]);
 
+  // Filter out 'Home' and 'Sports' from product categories
+  const filteredCategories = uniqueCategories
+    .filter(category => category && category.toLowerCase() !== 'home' && category.toLowerCase() !== 'sports')
+    .sort();
+
   return {
-    productCategories: uniqueCategories.sort(),
+    productCategories: filteredCategories,
     customerRegions: uniqueRegions.sort(),
     genders: uniqueGenders.sort(),
     paymentMethods: uniquePaymentMethods.sort(),

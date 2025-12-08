@@ -130,7 +130,8 @@ transactionSchema.index({ customerRegion: 1, date: -1 });
 // Single field indexes for individual filters
 transactionSchema.index({ customerName: 'text', phoneNumber: 'text' }); // Text search index
 transactionSchema.index({ finalAmount: 1 }); // Sorting by amount
-transactionSchema.index({ age: 1 }); // Age range filtering
+transactionSchema.index({ quantity: 1 }); // Sorting by quantity
+transactionSchema.index({ age: 1 }); // Age range filtering and sorting
 transactionSchema.index({ tags: 1 }); // Tags filtering
 transactionSchema.index({ customerName: 1 }); // For sorting by customerName
 transactionSchema.index({ date: -1 }); // Default date sorting

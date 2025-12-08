@@ -10,6 +10,16 @@ const TransactionsTable = ({ transactions, loading }) => {
       return `+91 ${phone}`
     }
 
+    const getFormattedPhoneNumberForCopy = (phone) => {
+      if (!phone) return ''
+      // If already has +91, return as is (remove any spaces for clean format)
+      if (phone.startsWith('+91')) {
+        return phone.replace(/\s+/g, '')
+      }
+      // Otherwise, add +91 prefix (remove any spaces from the number)
+      return `+91${phone.replace(/\s+/g, '')}`
+    }
+
     const formatCurrency = (amount) => {
       if (!amount && amount !== 0) return '-'
       return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -113,7 +123,7 @@ const TransactionsTable = ({ transactions, loading }) => {
                       <span>{formatPhoneNumber(transaction.phoneNumber)}</span>
                       <button
                         className="p-1 rounded hover:bg-[#f3f4f6] transition-colors"
-                        onClick={() => copyToClipboard(transaction.phoneNumber)}
+                        onClick={() => copyToClipboard(getFormattedPhoneNumberForCopy(transaction.phoneNumber))}
                         title="Copy"
                       >
                         <svg className="w-3.5 h-3.5 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

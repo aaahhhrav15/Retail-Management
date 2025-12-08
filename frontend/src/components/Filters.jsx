@@ -35,11 +35,11 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
                 console.error('Error loading filter options:', error)
                 // Fallback to default values
                 setFilterOptions({
-                    productCategories: ['Electronics', 'Clothing', 'Beauty', 'Home', 'Sports'],
+                    productCategories: ['Electronics', 'Clothing', 'Beauty'],
                     customerRegions: ['East', 'West', 'North', 'South', 'Central'],
                     genders: ['Male', 'Female'],
                     paymentMethods: ['UPI', 'Credit Card', 'Debit Card', 'Cash', 'Net Banking'],
-                    tags: ['New', 'Sale', 'Featured', 'Popular']
+                    tags: ['accessories', 'beauty', 'casual', 'cotton', 'fashion', 'formal', 'fragrance-free', 'gadgets', 'makeup', 'organic', 'portable', 'skincare', 'smart', 'unisex', 'wireless']
                 })
             } finally {
                 setLoading(false)
@@ -58,8 +58,14 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
       { value: '-customerName', label: 'Sort by: Customer Name (Z-A)' },
       { value: 'date', label: 'Sort by: Date (Newest)' },
       { value: '-date', label: 'Sort by: Date (Oldest)' },
+      { value: 'transactionId', label: 'Sort by: Transaction ID (Low to High)' },
+      { value: '-transactionId', label: 'Sort by: Transaction ID (High to Low)' },
       { value: 'finalAmount', label: 'Sort by: Amount (High to Low)' },
-      { value: '-finalAmount', label: 'Sort by: Amount (Low to High)' }
+      { value: '-finalAmount', label: 'Sort by: Amount (Low to High)' },
+      { value: 'quantity', label: 'Sort by: Quantity (High to Low)' },
+      { value: '-quantity', label: 'Sort by: Quantity (Low to High)' },
+      { value: 'age', label: 'Sort by: Age (Low to High)' },
+      { value: '-age', label: 'Sort by: Age (High to Low)' }
     ]
 
     // Handle age filter change

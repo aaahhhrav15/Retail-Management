@@ -23,7 +23,7 @@ body {
 [title],
 [data-title-backup] {
   position: relative;
-  cursor: help;
+  cursor: pointer;
 }
 
 [title]::after,

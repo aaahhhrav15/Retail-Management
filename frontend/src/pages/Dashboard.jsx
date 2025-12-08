@@ -87,11 +87,21 @@ const Dashboard = () => {
       }
       
       // Handle search query (use debounced version)
+      // Search both customerName and phoneNumber simultaneously for better results
       if (debouncedSearchQuery.trim()) {
         const query = debouncedSearchQuery.trim()
-        if (/^\d+$/.test(query)) {
-          searchFilters.phoneNumber = query
-        } else {
+        // Clean phone number (remove non-digits) for phone search
+        const cleanedPhone = query.replace(/\D/g, '')
+        
+        // If query contains only digits, prioritize phone search but also search name
+        // This allows finding customers by phone even if they have numbers in their name
+        if (cleanedPhone.length > 0) {
+          searchFilters.phoneNumber = cleanedPhone
+        }
+        
+        // Always search customerName for text queries (case-insensitive search handled by backend)
+        // This allows finding customers by name even if query contains numbers
+        if (query.length > 0) {
           searchFilters.customerName = query
         }
       }
