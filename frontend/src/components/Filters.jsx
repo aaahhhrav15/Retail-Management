@@ -60,10 +60,10 @@ const Filters = ({ filters, onFilterChange, onRefresh }) => {
       { value: '-date', label: 'Sort by: Date (Oldest)' },
       { value: 'transactionId', label: 'Sort by: Transaction ID (Low to High)' },
       { value: '-transactionId', label: 'Sort by: Transaction ID (High to Low)' },
-      { value: 'finalAmount', label: 'Sort by: Amount (High to Low)' },
       { value: '-finalAmount', label: 'Sort by: Amount (Low to High)' },
-      { value: 'quantity', label: 'Sort by: Quantity (High to Low)' },
+      { value: 'finalAmount', label: 'Sort by: Amount (High to Low)' },
       { value: '-quantity', label: 'Sort by: Quantity (Low to High)' },
+      { value: 'quantity', label: 'Sort by: Quantity (High to Low)' },
       { value: 'age', label: 'Sort by: Age (Low to High)' },
       { value: '-age', label: 'Sort by: Age (High to Low)' }
     ]
