@@ -10,7 +10,14 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://retail-management-jade.vercel.app',
+    'http://localhost:5173', // Vite default port
+    'http://localhost:3000'  // Common React port
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
